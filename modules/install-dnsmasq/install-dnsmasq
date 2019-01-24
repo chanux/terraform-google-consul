@@ -3,6 +3,7 @@
 # with the following operating systems:
 #
 # - Ubuntu 16.04
+# - CentOS 7
 
 set -e
 
@@ -69,6 +70,10 @@ function has_apt_get {
   [[ -n "$(command -v apt-get)" ]]
 }
 
+function has_yum {
+  [[ -n "$(command -v yum)" ]]
+}
+
 function install_dnsmasq {
   local -r consul_ip="$1"
 
@@ -77,8 +82,10 @@ function install_dnsmasq {
   if $(has_apt_get); then
     sudo apt-get update -y
     sudo apt-get install -y dnsmasq
+  elif $(has_apt); then
+    sudo yum install -y dnsmasq
   else
-    log_error "Could not find apt-get. Cannot install on this OS."
+    log_error "Could not find apt-get or yum. Cannot install dependencies on this OS."
     exit 1
   fi
 }
