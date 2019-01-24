@@ -3,6 +3,7 @@
 # operating systems:
 #
 # - Ubuntu 16.04
+# - Centos 7 
 
 set -e
 
@@ -51,6 +52,13 @@ function install_supervisord_debian {
   sudo systemctl enable supervisor
 }
 
+function install_supervisord_centos {
+  sudo yum install -y supervisor
+
+  # CentOS default config is good enough
+  sudo systemctl enable supervisord
+}
+
 function create_supervisor_config {
   sudo mkdir -p "$SUPERVISOR_CONF_DIR"
   sudo cp "$SCRIPT_DIR/supervisord.conf" "$SUPERVISOR_DIR/supervisord.conf"
@@ -71,6 +79,9 @@ function install_dependencies {
     sudo apt-get update -y
     sudo apt-get install -y curl unzip jq
     install_supervisord_debian
+  elif $(has_yum); then
+    sudo yum install -y curl unzip jq
+    install_supervisord_centos
   else
     log_error "Could not find apt-get or yum. Cannot install dependencies on this OS."
     exit 1
