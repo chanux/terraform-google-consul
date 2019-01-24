@@ -13,7 +13,12 @@ source "/opt/gruntwork/bash-commons/string.sh"
 readonly EMPTY_VAL="__EMPTY__"
 
 readonly CONSUL_CONFIG_FILE="default.json"
-readonly SUPERVISOR_CONFIG_PATH="/etc/supervisor/conf.d/run-consul.conf"
+
+if $(has_apt_get); then
+    readonly SUPERVISOR_CONFIG_PATH="/etc/supervisor/conf.d/run-consul.conf"
+elif $(has_yum); then
+    readonly SUPERVISOR_CONFIG_PATH="/etc/supervisor.d/run-consul.ini"
+fi
 
 readonly COMPUTE_INSTANCE_METADATA_URL="http://metadata.google.internal/computeMetadata/v1"
 readonly GOOGLE_CLOUD_METADATA_REQUEST_HEADER="Metadata-Flavor: Google"
@@ -69,6 +74,15 @@ function print_usage {
   echo "Example:"
   echo
   echo "  run-consul --server --cluster-tag-name consul-xyz --config-dir /custom/path/to/consul/config"
+}
+
+# Using package manager checks to determine OS.
+function has_yum {
+  [ -n "$(command -v yum)" ]
+}
+
+function has_apt_get {
+  [ -n "$(command -v apt-get)" ]
 }
 
 # Get the value at a specific Instance Metadata path.
